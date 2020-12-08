@@ -98,6 +98,8 @@ class Scanner {
 			case '/':
 				if (match('/')) {
 					skipRestOfLine();
+				} else if (match('*')) {
+					skipBlockComment();
 				} else {
 					addToken(TokenType.SLASH, null);
 				}
@@ -132,6 +134,18 @@ class Scanner {
 	private void skipRestOfLine() {
 		while (peek() != '\n' && !isAtEnd()) {
 			this.current++;
+		}
+	}
+
+	private void skipBlockComment() {
+		while (peek() != '*' && peekNext() != '/' && !isAtEnd()) {
+			if (peek() == '\n') {
+				this.line++;
+			}
+			this.current++;
+		}
+		if (!this.isAtEnd()) {
+			this.current += 2;
 		}
 	}
 
