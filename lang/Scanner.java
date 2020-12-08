@@ -1,4 +1,4 @@
-package jlox;
+package jlox.lang;
 
 import java.util.List;
 import java.util.Map;
