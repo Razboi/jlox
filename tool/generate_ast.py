@@ -19,12 +19,23 @@ def define_ast(output_dir, base_name, types):
     f.write("package jlox.lang;\n\n")
     f.write("import java.util.List;\n\n")
     f.write("abstract class " + base_name + " {\n\n")
+    define_visitor(f, base_name, types)
     for type in types:
         class_name = type.split(':')[0].strip()
         fields = type.split(':')[1].strip()
         define_type(f, base_name, class_name, fields)
+
+    f.write("\n")
+    f.write("   abstract <R> R accept(Visitor<R> visitor);\n")
     f.write("}\n")
     f.close()
+
+def define_visitor(f, base_name, types):
+    f.write("   interface Visitor<R> {\n")
+    for type in types:
+        type_name = type.split(':')[0].strip()
+        f.write("       R visit" + type_name + base_name + '(' + type_name + ' ' + base_name.lower() + ");\n")
+    f.write("   }\n\n")
 
 def define_type(f, base_name, class_name, fields_list):
     f.write("   static class " + class_name + " extends " + base_name + " {\n")
@@ -41,6 +52,10 @@ def define_type(f, base_name, class_name, fields_list):
         name = field.split(" ")[1]
         f.write("           this." + name + " = " + name + ";\n")
 
+    f.write("       }\n\n")
+    f.write("    @Override\n")
+    f.write("    <R> R accept(Visitor<R> visitor) {\n")
+    f.write("       return visitor.visit" + class_name + base_name + "(this);\n")
     f.write("       }\n")
     f.write("   }\n\n")
 

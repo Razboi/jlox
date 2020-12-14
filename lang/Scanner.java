@@ -151,7 +151,7 @@ class Scanner {
 
 
 	private void skipRestOfDigits() {
-		while (isDigit(this.source.charAt(this.current))) {
+		while (!this.isAtEnd() && isDigit(this.source.charAt(this.current))) {
 			this.current++;
 		}
 	}
