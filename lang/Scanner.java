@@ -114,6 +114,12 @@ class Scanner {
 			case '"':
 				parseString();
 				break;
+			case '?':
+				addToken(TokenType.QUESTION, null);
+				break;
+			case ':':
+				addToken(TokenType.COLON, null);
+				break;
 			default:
 				if (isDigit(c)) {
 					parseNumber();
@@ -148,7 +154,6 @@ class Scanner {
 			this.current += 2;
 		}
 	}
-
 
 	private void skipRestOfDigits() {
 		while (!this.isAtEnd() && isDigit(this.source.charAt(this.current))) {
