@@ -82,7 +82,7 @@ class Scanner {
 				break;
 			case '*':
 				addToken(TokenType.STAR, null);
-
+				break;
 			case '!':
 				addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG, null);
 				break;
