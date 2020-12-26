@@ -8,10 +8,15 @@ def main():
         return 64
     output_dir = sys.argv[1:][0]
     define_ast(output_dir, "Expr", [
+            "Ternary: Expr condition, Expr left, Expr right",
             "Binary : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal : Object value",
             "Unary : Token operator, Expr right"
+        ])
+    define_ast(output_dir, "Stmt", [
+            "Expression : Expr expression",
+            "Print : Expr expression"
         ])
 
 def define_ast(output_dir, base_name, types):

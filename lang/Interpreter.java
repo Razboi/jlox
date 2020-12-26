@@ -1,6 +1,8 @@
 package jlox.lang;
 
-class Interpreter implements Expr.Visitor<Object> {
+import java.util.List;
+
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	private String stringify(Object object) {
 		if (object == null) return "nil";
@@ -15,10 +17,15 @@ class Interpreter implements Expr.Visitor<Object> {
 		return object.toString();
 	}
 
-	public void interpret(Expr expression) {
+	private void execute(Stmt stmt) {
+		stmt.accept(this);
+	}
+
+	public void interpret(List<Stmt> statements) {
 		try {
-			Object value = evaluate(expression);
-			System.out.println(stringify(value));
+			for (Stmt statement : statements) {
+				execute(statement);
+			}
 		} catch (RuntimeError error) {
 			Lox.runtimeError(error);
 		}
@@ -105,7 +112,13 @@ class Interpreter implements Expr.Visitor<Object> {
 				if (left instanceof Double && right instanceof Double) {
 					return (double)left + (double)right;
 				}
-				if (left instanceof String && right instanceof String) {
+				if (left instanceof String || right instanceof String) {
+					if (left instanceof Double) {
+						return left.toString() + (String)right;
+					}
+					if (right instanceof Double) {
+						return (String)left + right.toString();
+					}
 					return (String)left + (String)right;
 				}
 				throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
@@ -127,5 +140,18 @@ class Interpreter implements Expr.Visitor<Object> {
 		
 		if (isTruthy(condition)) return left;
 		return right;
+	}
+
+	@Override
+	public Void visitExpressionStmt(Stmt.Expression stmt) {
+		evaluate(stmt.expression);
+		return null;
+	}
+
+	@Override
+	public Void visitPrintStmt(Stmt.Print stmt) {
+		Object value = evaluate(stmt.expression);
+		System.out.println(stringify(value));
+		return null;
 	}
 }
