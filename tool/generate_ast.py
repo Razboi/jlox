@@ -8,6 +8,7 @@ def main():
         return 64
     output_dir = sys.argv[1:][0]
     define_ast(output_dir, "Expr", [
+            "Logical : Expr left, Token operator, Expr right",
             "Assign : Token name, Expr value",
             "Ternary: Expr condition, Expr left, Expr right",
             "Binary : Expr left, Token operator, Expr right",
@@ -17,6 +18,7 @@ def main():
             "Variable: Token name"
         ])
     define_ast(output_dir, "Stmt", [
+            "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "Block : List<Stmt> statements",
             "Expression : Expr expression",
             "Print : Expr expression",
