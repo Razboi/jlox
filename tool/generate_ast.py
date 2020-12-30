@@ -18,6 +18,7 @@ def main():
             "Variable: Token name"
         ])
     define_ast(output_dir, "Stmt", [
+            "While : Expr condition, Stmt body",
             "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "Block : List<Stmt> statements",
             "Expression : Expr expression",
