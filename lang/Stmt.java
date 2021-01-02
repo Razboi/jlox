@@ -5,6 +5,8 @@ import java.util.List;
 abstract class Stmt {
 
    interface Visitor<R> {
+       R visitBreakStmt(Break stmt);
+       R visitContinueStmt(Continue stmt);
        R visitWhileStmt(While stmt);
        R visitIfStmt(If stmt);
        R visitBlockStmt(Block stmt);
@@ -13,13 +15,37 @@ abstract class Stmt {
        R visitVarStmt(Var stmt);
    }
 
+   static class Break extends Stmt {
+
+       Break() {
+       }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+       return visitor.visitBreakStmt(this);
+       }
+   }
+
+   static class Continue extends Stmt {
+
+       Continue() {
+       }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+       return visitor.visitContinueStmt(this);
+       }
+   }
+
    static class While extends Stmt {
        final Expr condition;
        final Stmt body;
+       final Boolean isForLoop;
 
-       While(Expr condition, Stmt body) {
+       While(Expr condition, Stmt body, Boolean isForLoop) {
            this.condition = condition;
            this.body = body;
+           this.isForLoop = isForLoop;
        }
 
     @Override

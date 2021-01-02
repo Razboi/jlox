@@ -39,8 +39,20 @@ class Parser {
 		if (match(TokenType.IF)) return ifStatement();
 		if (match(TokenType.WHILE)) return whileStatement();
 		if (match(TokenType.FOR)) return forStatement();
+		if (match(TokenType.BREAK)) return breakStatement();
+		if (match(TokenType.CONTINUE)) return continueStatement();
 		return expressionStatement();
 	}
+
+	private Stmt breakStatement() {
+		consume(TokenType.SEMICOLON, "Expect ';' after break statement.");
+		return new Stmt.Break();
+	}	
+
+	private Stmt continueStatement() {
+		consume(TokenType.SEMICOLON, "Expect ';' after continue statement.");
+		return new Stmt.Continue();
+	}	
 
 	private Stmt forStatement() {
 		consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
@@ -76,7 +88,7 @@ class Parser {
 		}
 
 		if (condition == null) condition = new Expr.Literal(true);
-		body = new Stmt.While(condition, body);
+		body = new Stmt.While(condition, body, true);
 
 		if (initializer != null) {
 			body = new Stmt.Block(Arrays.asList(initializer, body));
@@ -90,7 +102,7 @@ class Parser {
 		Expr condition = expression();
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after 'while' condition.");
 		Stmt body = statement();
-		return new Stmt.While(condition, body);
+		return new Stmt.While(condition, body, false);
 	}
 
 	private Stmt ifStatement() {

@@ -10,7 +10,6 @@ import java.util.List;
 
 
 public class Lox {
-	private static final Interpreter interpreter = new Interpreter();
 	static boolean hadError = false;
 	static boolean hadRuntimeError = false;
 
@@ -27,7 +26,7 @@ public class Lox {
 
 	private static void runFile(String path) throws IOException {
 		byte[] bytes = Files.readAllBytes(Paths.get(path));
-		run(new String(bytes, Charset.defaultCharset()));
+		run(new String(bytes, Charset.defaultCharset()), false);
 		if (hadError) System.exit(65);
 		if (hadRuntimeError) System.exit(70);
 	}
@@ -40,12 +39,12 @@ public class Lox {
 			System.out.print("> ");
 			String line = reader.readLine();
 			if (line == null) break;
-			run(line);
+			run(line, true);
 			hadError = false;
 		}
 	}
 
-	private static void run(String source) {
+	private static void run(String source, Boolean verbose) {
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
 		Parser parser = new Parser(tokens);
@@ -53,6 +52,7 @@ public class Lox {
 
 		if (hadError) return;
 
+		Interpreter interpreter = new Interpreter(verbose);
 		interpreter.interpret(statements);
 
 		for (Token token : tokens) {

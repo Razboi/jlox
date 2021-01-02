@@ -18,7 +18,9 @@ def main():
             "Variable: Token name"
         ])
     define_ast(output_dir, "Stmt", [
-            "While : Expr condition, Stmt body",
+            "Break :",
+            "Continue :",
+            "While : Expr condition, Stmt body, Boolean isForLoop",
             "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "Block : List<Stmt> statements",
             "Expression : Expr expression",
@@ -51,7 +53,7 @@ def define_visitor(f, base_name, types):
 
 def define_type(f, base_name, class_name, fields_list):
     f.write("   static class " + class_name + " extends " + base_name + " {\n")
-    fields = fields_list.split(", ")
+    fields = fields_list.split(", ") if fields_list else []
 
     #Class fields
     for field in fields:

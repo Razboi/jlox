@@ -3,7 +3,14 @@ package jlox.lang;
 import java.util.List;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+	private static boolean isVerbose = false;
 	Environment environment = new Environment();
+	private Boolean isBreakStatement = false;
+	private Boolean isContinueStatement = false;
+
+	public Interpreter (Boolean isVerbose) {
+		this.isVerbose = isVerbose;
+	}
 
 	private String stringify(Object object) {
 		if (object == null) return "nil";
@@ -19,7 +26,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 
 	private void execute(Stmt stmt) {
-		stmt.accept(this);
+		Object result = stmt.accept(this);
 	}
 
 	public void interpret(List<Stmt> statements) {
@@ -169,8 +176,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitExpressionStmt(Stmt.Expression stmt) {
 		Object value = evaluate(stmt.expression);
-		// TODO: This causes prints in for loops to be duplicated. Fix me
-		System.out.println(stringify(value));
+		if (this.isVerbose) {
+			System.out.println(stringify(value));
+		}
 		return null;
 	}
 
@@ -203,9 +211,16 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	@Override
 	public Void visitWhileStmt(Stmt.While stmt) {
-		while (isTruthy(evaluate(stmt.condition))) {
+		while (isTruthy(evaluate(stmt.condition)) && !this.isBreakStatement) {
 			execute(stmt.body);
+			// if its a for loop execute the increment statement (last one) after a continue statement
+			if (stmt.isForLoop && this.isContinueStatement && stmt.body instanceof Stmt.Block) {
+				Stmt.Block body = (Stmt.Block) stmt.body;
+				execute(body.statements.get(body.statements.size() - 1));
+				this.isContinueStatement = false;
+			}
 		}
+		this.isBreakStatement = false;
 		return null;
 	}
 
@@ -215,12 +230,27 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		return null;
 	}
 
+	@Override
+	public Void visitBreakStmt(Stmt.Break stmt) {
+		this.isBreakStatement = true;
+		return null;
+	}
+
+	@Override
+	public Void visitContinueStmt(Stmt.Continue stmt) {
+		this.isContinueStatement = true;
+		return null;
+	}
+
 	private void executeBlock(List<Stmt> statements, Environment environment) {
 		Environment previous = this.environment;
 		try {
 			this.environment = environment;
 			for (Stmt statement : statements) {
 				execute(statement);
+				if (this.isBreakStatement || this.isContinueStatement) {
+					break;
+				}
 			}
 		} finally {
 			this.environment = previous;
