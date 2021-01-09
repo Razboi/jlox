@@ -8,6 +8,7 @@ def main():
         return 64
     output_dir = sys.argv[1:][0]
     define_ast(output_dir, "Expr", [
+            "Call : Expr callee, Token paren, List<Expr> arguments",
             "Logical : Expr left, Token operator, Expr right",
             "Assign : Token name, Expr value",
             "Ternary: Expr condition, Expr left, Expr right",
@@ -18,6 +19,8 @@ def main():
             "Variable: Token name"
         ])
     define_ast(output_dir, "Stmt", [
+            "Return : Token keyword, Expr value",
+            "Function : Token name, List<Token> params, List<Stmt> body",
             "Break :",
             "Continue :",
             "While : Expr condition, Stmt body, Boolean isForLoop",
